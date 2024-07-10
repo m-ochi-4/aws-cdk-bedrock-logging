@@ -1,0 +1,116 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Deny",
+            "Action": [
+                "bedrock:PutModelInvocationLoggingConfiguration",
+                "bedrock:DeleteModelInvocationLoggingConfiguration"
+            ],
+            "Resource": "*",
+            "Condition": {
+                "StringNotLike": {
+                    "aws:PrincipalArn": [
+                        "arn:aws:iam::*:role/AWSControlTowerExecution",
+                        "arn:aws:iam::*:role/stacksets-exec-*",
+                        "arn:aws:iam::*:role/aws-bedrock-logs-lambda-*"
+                    ]
+                }
+            }
+        },
+        {
+            "Effect": "Deny",
+            "Action": [
+                "s3:CreateBucket",
+                "s3:DeleteBucket",
+                "s3:PutBucketVersioning",
+                "s3:PutBucketTagging",
+                "s3:PutEncryptionConfiguration",
+                "s3:PutBucketPolicy",
+                "s3:DeleteBucketPolicy",
+                "s3:PutBucketOwnershipControls",
+                "s3:PutLifecycleConfiguration",
+                "s3:PauseReplication",
+                "s3:PutReplicationConfiguration"
+            ],
+            "Resource": "arn:aws:s3:::aws-bedrock-logs-*",
+            "Condition": {
+                "ArnNotLike": {
+                    "aws:PrincipalArn": [
+                        "arn:aws:iam::*:role/AWSControlTowerExecution",
+                        "arn:aws:iam::*:role/stacksets-exec-*"
+                    ]
+                }
+            }
+        },
+        {
+            "Effect": "Deny",
+            "Action": [
+                "iam:TagRole",
+                "iam:UntagRole",
+                "lambda:TagResource",
+                "lambda:UntagResource"
+            ],
+            "Resource": [
+                "arn:aws:iam::*:role/*",
+                "arn:aws:lambda:*:*:function:*"
+            ],
+            "Condition": {
+                "ForAnyValue:StringEquals": {
+                    "aws:TagKeys": "audit"
+                },
+                "ArnNotLike": {
+                    "aws:PrincipalArn": [
+                        "arn:aws:iam::*:role/AWSControlTowerExecution",
+                        "arn:aws:iam::*:role/stacksets-exec-*"
+                    ]
+                }
+            }
+        },
+        {
+            "Effect": "Deny",
+            "Action": [
+                "iam:AttachRolePolicy",
+                "iam:CreateRole",
+                "iam:DeleteRole",
+                "iam:DeleteRolePermissionsBoundary",
+                "iam:DeleteRolePolicy",
+                "iam:DetachRolePolicy",
+                "iam:PutRolePermissionsBoundary",
+                "iam:PutRolePolicy",
+                "iam:UpdateAssumeRolePolicy",
+                "iam:UpdateRole",
+                "iam:UpdateRoleDescription",
+                "lambda:InvokeFunction",
+                "lambda:InvokeFunctionUrl",
+                "lambda:InvokeAsync",
+                "lambda:CreateFunction",
+                "lambda:DeleteFunction",
+                "lambda:DeleteFunctionConcurrency",
+                "lambda:DeleteFunctionEventInvokeConfig",
+                "lambda:PutFunctionConcurrency",
+                "lambda:PutFunctionEventInvokeConfig",
+                "lambda:UpdateFunctionCode",
+                "lambda:UpdateFunctionConfiguration",
+                "lambda:UpdateFunctionEventInvokeConfig",
+                "lambda:AddPermission",
+                "lambda:RemovePermission"
+            ],
+            "Resource": [
+                "arn:aws:iam::*:role/*",
+                "arn:aws:lambda:*:*:function:*"
+            ],
+            "Condition": {
+                "StringEquals": {
+                    "aws:ResourceTag/audit": "true"
+                },
+                "ArnNotLike": {
+                    "aws:PrincipalArn": [
+                        "arn:aws:iam::*:role/AWSControlTowerExecution",
+                        "arn:aws:iam::*:role/stacksets-exec-*"
+                    ]
+                }
+            }
+        }
+    ]
+}
